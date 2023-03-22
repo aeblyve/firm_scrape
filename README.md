@@ -1,6 +1,6 @@
 # firm_scrape
 
-Warning: This project is incomplete. 
+Warning: This project is incomplete and hacky.
 
 This was a project to make a "universal web scraper" for various types of professional firms.
 The result is a full stack web application in flask, with sqlalchemy and vanilla html/css/js.
