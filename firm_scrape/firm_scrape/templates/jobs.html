@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% macro jobRow(job, color) -%}
+<tr style="color: {{ color }};"><td><a href="http://{{ job.domain }}">{{ job.domain }}</a></td><td>{{ job.firm_type }}</td><td>{{ job.completed }}</td><td>{{ job.failed }}</td><td title="{{ job.fail_reason }}">{{ job.fail_reason[:30] + "..." }}</td><td><a href="{{ url_for('download_job_report', id=job.id) }}">Report</a></td><td><a href="{{ url_for('download_all_job_emails', id=job.id) }}">Emails</a></td></tr>
+{%- endmacro %}
+
+
+{% block content %}
+{% if (jobs is defined) and jobs %}
+<center>
+<table>
+    <tbody>
+        <tr>
+            <th>Domain</th>
+            <th>FirmType</th>
+            <th>Completed</th>
+            <th>Failed?</th>
+            <th>Fail Reason</th>
+            <th>Report</th>
+            <th>Emails</th>
+        </tr>
+    {% for job in jobs %}
+
+        {% if job.failed %}
+        {{ jobRow(job, "red") }}
+        {% else %}
+        {{ jobRow(job, "green") }}
+        {% endif %}
+
+    {% endfor %}
+    </tbody>
+</table>
+</center>
+{% else %}
+No jobs listed!
+{% endif %}
+<h3>HELP:</h3>
+<p>
+    <ul>
+        <li>To view the full failure reason for a domain, hover over the truncated Fail Reason text.</li>
+    </ul>
+</p>
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+<form id="scraperJobForm">
+    <center>
+    <table >
+        <tbody>
+            <tr>
+                <th>Firm List</th>
+                <th>Firm Type</th>
+                <th>Limit </th>
+            </tr>
+            <tr class="row_to_clone">
+                <td><input class="input" type="file", name="firm_list[0]"></td>
+                <td><select class="input" name="firm_type[0]"><option value="none">Select FirmType</option><option value="law">Law Firm</option><option value="investment">Investment Bank</option></select></td>
+                <td><input class="input" type="number", name="limit[0]"></td>
+            </tr>
+        </tbody>
+    </table>
+    <br/>
+    <div><button style="margin-right: auto" type="Submit">Submit</button></div>
+    <br/>
+    <div ><button style="margin-right: auto" onclick="addRow(); return false;" href="#">Add row</button></div>
+    </div>
+</form>
+    </center>
+<h3 id="1">
+    HELP:
+</h3>
+<p>
+    Enter a list of jobs to perform and hit Submit.
+    <ul>
+        <li>Ensure that you select the correct firm type for each firm list. Each firm type requires different logic.</li>
+        <li>Select a limit if desired. Leaving the limit field blank means "unlimited".
+    </ul>
+</p>
+<script>
+/*
+ * addrow.js - an example JavaScript program for adding a row of input fields
+ * to an HTML form
+ *
+ * This program is placed into the public domain.
+ *
+ * The orginal author is Dwayne C. Litzenberger.
+ *
+ * THIS SOFTWARE IS PROVIDED AS-IS WITHOUT WARRANTY
+ * OF ANY KIND, NOT EVEN THE IMPLIED WARRANTY OF
+ * MERCHANTABILITY. THE AUTHOR OF THIS SOFTWARE,
+ * ASSUMES _NO_ RESPONSIBILITY FOR ANY CONSEQUENCE
+ * RESULTING FROM THE USE, MODIFICATION, OR
+ * REDISTRIBUTION OF THIS SOFTWARE.
+ *
+ * Home page: http://www.dlitz.net/software/addrow/
+ *
+ * History:
+ *  Version 2 - 2006-01-14  dlitz@dlitz.net
+ *   - Add support for MSIE 6
+ *   - Separate HTML and JavaScript into separate files
+ *   - Tested on:
+ *      + Konqueror 3.4.2
+ *      + Microsoft Internet Explorer 5.00
+ *      + Microsoft Internet Explorer 6.0
+ *      + Mozilla Firefox 1.0.4 (via browsershots.org)
+ *      + Mozilla Firefox 1.5
+ *      + Opera 8.51
+ *      + Safari 2.0 (via browsershots.org)
+ *  Version 1
+ *   - Initial release
+ *
+ */
+
+function addRow() {
+    /* Declare variables */
+    var elements, templateRow, rowCount, row, className, newRow, element;
+    var i, s, t;
+
+    /* Get and count all "tr" elements with class="row".    The last one will
+     * be serve as a template. */
+    if (!document.getElementsByTagName)
+        return false; /* DOM not supported */
+    elements = document.getElementsByTagName("tr");
+    templateRow = null;
+    rowCount = 0;
+    for (i = 0; i < elements.length; i++) {
+        row = elements.item(i);
+
+        /* Get the "class" attribute of the row. */
+        className = null;
+        if (row.getAttribute)
+            className = row.getAttribute('class')
+        if (className == null && row.attributes) {    // MSIE 5
+            /* getAttribute('class') always returns null on MSIE 5, and
+             * row.attributes doesn't work on Firefox 1.0.    Go figure. */
+            className = row.attributes['class'];
+            if (className && typeof(className) == 'object' && className.value) {
+                // MSIE 6
+                className = className.value;
+            }
+        }
+
+        /* This is not one of the rows we're looking for.    Move along. */
+        if (className != "row_to_clone")
+            continue;
+
+        /* This *is* a row we're looking for. */
+        templateRow = row;
+        rowCount++;
+    }
+    if (templateRow == null)
+        return false; /* Couldn't find a template row. */
+
+    /* Make a copy of the template row */
+    newRow = templateRow.cloneNode(true);
+
+    /* Change the form variables e.g. price[x] -> price[rowCount] */
+    elements = newRow.getElementsByClassName("input");
+    for (i = 0; i < elements.length; i++) {
+        element = elements.item(i);
+        s = null;
+        s = element.getAttribute("name");
+        if (s == null)
+            continue;
+        t = s.split("[");
+        if (t.length < 2)
+            continue;
+        s = t[0] + "[" + rowCount.toString() + "]";
+        element.setAttribute("name", s);
+        element.value = "";
+    }
+
+    /* Add the newly-created row to the table */
+    templateRow.parentNode.appendChild(newRow);
+    return true;
+}
+
+function saveOrOpenBlob(blob, fileName) {
+    window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+    window.requestFileSystem(window.TEMPORARY, 1024 * 1024, function (fs) {
+        fs.root.getFile(fileName, { create: true }, function (fileEntry) {
+            fileEntry.createWriter(function (fileWriter) {
+                fileWriter.addEventListener("writeend", function () {
+                    window.location = fileEntry.toURL();
+                }, false);
+                fileWriter.write(blob, "_blank");
+            }, function () { });
+        }, function () { });
+    }, function () { });
+}
+
+/* set ts=8 sw=4 sts=4 expandtab: */
+
+ function notifySubmission(event) {
+     const notify = document.createElement("h3");
+     const content = document.createTextNode(`Sent request to the server at ${Date().toString()}. Please wait.`);
+     notify.appendChild(content);
+     const sibling = document.getElementById("1");
+     // document.body.insertBefore(notify, sibling);
+ }
+
+const readUploadedFileAsText = (inputFile) => {
+  const temporaryFileReader = new FileReader();
+
+  return new Promise((resolve, reject) => {
+    temporaryFileReader.onerror = () => {
+      temporaryFileReader.abort();
+      reject(new DOMException("Problem parsing input file."));
+    };
+
+    temporaryFileReader.onload = () => {
+      resolve(temporaryFileReader.result);
+    };
+    temporaryFileReader.readAsText(inputFile);
+  });
+};
+
+ async function handleSubmit(event) {
+     const time = Date()
+     event.preventDefault();
+
+     const form_data = new FormData(event.target);
+     const form_value = Object.fromEntries(form_data.entries());
+     var tuple_count = Object.keys(form_value).length / 3;
+     let tuple_list = [];
+     console.log(form_value);
+
+     for (let i=0; i < tuple_count; i++) {
+         let file = form_value[`firm_list[${i}]`];
+         let contents = await readUploadedFileAsText(file);
+         let tuple = [contents, form_value[`firm_type[${i}]`], form_value[`limit[${i}]`]]
+         tuple_list.push(tuple);
+         console.log(i);
+         console.log(tuple)
+     }
+
+     let to_send = {"jobs": tuple_list};
+
+
+     let xhr = new XMLHttpRequest();
+     let url = "http://127.0.0.1:8000/add";
+
+     xhr.open("POST", url, true);
+     xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Print received data from server
+            //var blob = this.response;
+            //var contentDispo = xhr.getResponseHeader('Content-Disposition');
+            var contentDispo = xhr.getAllResponseHeaders();
+            console.log(contentDispo)
+            //var fileName = contentDispo.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
+            //saveOrOpenBlob(blob, "file.csv");
+            console.log(this);
+
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.responseText));
+            element.setAttribute('download', `firm-scrape_${time}.csv`);
+
+            element.style.display = 'none';
+
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+    };
+
+    // Converting JSON data to string
+    var json_data = JSON.stringify(to_send);
+     console.log(json_data);
+
+
+    // Sending data with the request
+    notifySubmission(event);
+    xhr.send(json_data);
+ }
+ const form = document.querySelector("#scraperJobForm");
+ form.addEventListener("submit", handleSubmit);
+</script>
+{% endblock %}

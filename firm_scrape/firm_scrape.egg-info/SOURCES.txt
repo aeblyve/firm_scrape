@@ -1,0 +1,10 @@
+setup.py
+firm-scrape/__init__.py
+firm-scrape/classes.py
+firm-scrape/constants.py
+firm-scrape/util.py
+firm_scrape.egg-info/PKG-INFO
+firm_scrape.egg-info/SOURCES.txt
+firm_scrape.egg-info/dependency_links.txt
+firm_scrape.egg-info/requires.txt
+firm_scrape.egg-info/top_level.txt

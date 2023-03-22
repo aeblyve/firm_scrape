@@ -1,0 +1,37 @@
+<head>
+    <title>FirmScrape</title>
+    <style>
+     a {
+         font-size: 20px;
+     }
+     body {
+         max-width: 1200px;
+         margin: auto;
+     }
+    table, th, td {
+        border: 1px solid;
+    }
+    </style>
+</head>
+<body>
+    <header style="border: 2px solid black; padding: 20px; display: flex; margin: 20px 0px;">
+    <h1>
+        FirmScrape
+    </h1>
+    <nav style="margin-left: auto;">
+        <a href="/">index</a>
+	<a href="/add">add</a>
+        <a href="/jobs">jobs</a>
+        <a href="/login">login</a>
+        <a href="/logout">logout</a>
+    </nav>
+    </header>
+    <section style="margin: 20px 0px; border: 2px solid black; padding: 20px;">
+  {% block content %}{% endblock %}
+    </section>
+</body>
+<footer>
+  <hr/>
+ <pre>2023 Leonid Belyaev</pre>
+</footer>
+</body>
